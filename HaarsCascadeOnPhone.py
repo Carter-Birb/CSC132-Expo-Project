@@ -23,6 +23,10 @@ while True:
     if key == ord('f'):
         FLIP_CAMERA = not FLIP_CAMERA
 
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('q'):
+        KeyboardInterrupt 
+
     if FLIP_CAMERA:
         frame = cv2.flip(frame, 1)
 
