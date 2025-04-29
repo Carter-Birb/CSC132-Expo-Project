@@ -5,7 +5,7 @@ import threading
 import cv2  # Import cv2 to handle image encoding
 
 app = Flask(__name__)
-tracker = FaceTracker(camera_index=1)  # Initialize the FaceTracker
+tracker = FaceTracker(camera_index=0)  # Initialize the FaceTracker
 
 # Motor settings
 MICROSTEPPING = 8  # Accepts 1, 2, 4, 8, 16, 32 microstepping
