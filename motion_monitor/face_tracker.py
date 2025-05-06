@@ -1,7 +1,7 @@
 import cv2
 
 class FaceTracker:
-    def __init__(self, camera_index=0, flip_camera=True, h_fov=70, v_fov=60, max_distance=100):
+    def __init__(self, camera_index=0, flip_camera=True, h_fov=70, v_fov=60, max_distance=50):
         """Initializes the FaceTracker with camera index, field of view, and max distance."""
         self.flip_camera = flip_camera
         self.h_fov = h_fov
@@ -45,6 +45,10 @@ class FaceTracker:
 
             # Estimate distance
             approx_distance = 5000 / w
+            
+            # Check if the max_distance is higher than the approx_distance
+            if approx_distance > self.max_distance:
+                return frame
 
             # Draw face bounding box and center point
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)

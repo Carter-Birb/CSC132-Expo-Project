@@ -116,6 +116,11 @@ def main():
         motor_commands = fetch_motor_commands()
 
         if motor_commands:
+            # Check if the quit flag is set
+            if motor_commands.get('quit'):
+                print("Quit signal received. Terminating program...")
+                break  # Exit the main loop to terminate the program
+
             motor_on = motor_commands['motor_on']
             motor_direction = motor_commands['direction']
 
@@ -134,6 +139,13 @@ def main():
 
             else:
                 print("Motor is off")
+
+        # Add a half-second delay between requests
+        time.sleep(0.5)
+
+    # Cleanup GPIO and recalibrate motor before exiting
+    recalibrate_motor()
+    GPIO.cleanup()
 
 if __name__ == "__main__":
     try:

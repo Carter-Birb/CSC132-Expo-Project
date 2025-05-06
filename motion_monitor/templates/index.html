@@ -65,6 +65,26 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
+        .quit-btn {
+            position: absolute;
+            bottom: 75px; /* Adjusted to appear above the settings button */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1002;
+            padding: 12px 18px;
+            background: #FF0000; /* Red background */
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .quit-btn:hover {
+            background: #CC0000; /* Darker red on hover */
+        }
+
         label {
             display: block;
             margin: 20px 0 10px;
@@ -86,6 +106,7 @@
     <div id="video-container">
         <img src="{{ url_for('video_feed') }}" id="video-feed">
         <button class="toggle-btn" onclick="toggleSettings()">⚙ Settings</button>
+        <button class="quit-btn" onclick="quitApplication()">Quit</button>
     </div>
 
     <div id="settings">
@@ -96,8 +117,8 @@
             </label>
 
             <label for="max_distance">Max Distance</label>
-            <input type="range" id="max_distance" name="max_distance" min="30" max="200" value="100">
-            <div class="slider-value"><span id="distance-value">100</span> px</div>
+            <input type="range" id="max_distance" name="max_distance" min="30" max="200" value="50">
+            <div class="slider-value"><span id="distance-value">50</span> px</div>
         </form>
     </div>
 
@@ -122,6 +143,27 @@
 
             distanceValue.textContent = distanceSlider.value;
         });
+
+        function quitApplication() {
+            if (confirm("Are you sure you want to quit?")) {
+                const formData = new FormData();
+                formData.append("quit", "true");
+
+                fetch("/set_config", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log("Server shutting down...");
+                        window.close(); // Attempt to close the browser window
+                    } else {
+                        console.error("Failed to shut down the server.");
+                    }
+                })
+                .catch(err => console.error("Error sending quit request:", err));
+            }
+        }
     </script>
 </body>
 </html>
