@@ -131,7 +131,12 @@ def main():
                 else:
                     # Send a step pulse to move the motor
                     send_motor_pulse()
-
+                    
+            elif motor_commands['quit']: # If the quit command is recieved, recalibrate the motor, then close the program.
+                recalibrate_motor()
+                GPIO.cleanup()
+                break
+            
             else:
                 print("Motor is off")
 
