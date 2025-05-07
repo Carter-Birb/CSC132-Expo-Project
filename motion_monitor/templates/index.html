@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Face Tracker Control</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #222;
+        }
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            background: #222;
+            color: #fff;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.light-mode {
+            background: #fff;
+            color: #111;
+        }
+        .main-content {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .video-wrapper {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #video-stream {
+            width: 100vw;
+            height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
+            object-fit: contain;
+            background: #111;
+            border-radius: 8px;
+            box-shadow: 0 0 20px #000a;
+            display: block;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        body.light-mode #video-stream {
+            background: #eee;
+            box-shadow: 0 0 20px #ccc;
+        }
+        /* Slide-out sidebar styles */
+        .sidebar {
+            height: 100vh;
+            width: 320px;
+            background: #333;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 100;
+            box-shadow: -2px 0 12px #000a;
+            transition: transform 0.35s cubic-bezier(.4,2,.6,1), background 0.3s, color 0.3s;
+            display: flex;
+            flex-direction: column;
+            padding: 32px 24px 24px 24px;
+            gap: 48px;
+            transform: translateX(100%);
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        body.light-mode .sidebar {
+            background: #f5f5f5;
+            color: #222;
+            box-shadow: -2px 0 12px #ccc;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        /* Bottom center buttons */
+        .bottom-center-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 32px;
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            z-index: 110;
+            pointer-events: none;
+        }
+        .bottom-center-bar button {
+            background: #555;
+            color: #fff;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 0 8px;
+            pointer-events: auto;
+            transition: background 0.2s, color 0.2s;
+        }
+        .bottom-center-bar button:hover {
+            background: #666;
+        }
+        body.light-mode .bottom-center-bar button {
+            background: #e0e0e0;
+            color: #222;
+        }
+        body.light-mode .bottom-center-bar button:hover {
+            background: #d0d0d0;
+        }
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 100vw;
+                padding: 18px 8px;
+            }
+            .main-content, .video-wrapper, #video-stream {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <img src="{{ url_for('video_feed') }}" id="video-feed">
+        <button class="toggle-btn" onclick="toggleSettings()">⚙ Settings</button>
+    </div>
+    <!-- Slide-out sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-title">⚙ Settings</div>
+        <div class="setting-group">
+            <label>
+                <input type="checkbox" id="flip-camera" checked>
+                Flip Camera
+            </label>
+
+            <label for="max_distance">Max Distance</label>
+            <input type="range" id="max_distance" name="max_distance" min="30" max="200" value="100">
+            <div class="slider-value"><span id="distance-value">100</span> px</div>
+        </form>
+    </div>
+    <script>
+        // Sidebar open/close logic using toggle
+        const sidebar = document.getElementById('sidebar');
+        const settingsBtn = document.getElementById('settings-btn');
+        settingsBtn.onclick = () => {
+            sidebar.classList.toggle('open');
+        };
+
+        // Optional: close sidebar if user clicks outside (not required, but nice UX)
+        document.addEventListener('mousedown', function(e) {
+            if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== settingsBtn) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
