@@ -79,6 +79,14 @@
             color: #222;
             box-shadow: -2px 0 12px #ccc;
         }
+        .sidebar-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .setting-group {
+            margin-bottom: 18px;
+        }
         label {
             display: block;
             margin-bottom: 8px;
@@ -132,9 +140,10 @@
     </style>
 </head>
 <body>
-    <div id="video-container">
-        <img src="{{ url_for('video_feed') }}" id="video-feed">
-        <button class="toggle-btn" onclick="toggleSettings()">⚙ Settings</button>
+    <div class="main-content">
+        <div class="video-wrapper">
+            <img id="video-stream" src="/video_feed" alt="Video Stream">
+        </div>
     </div>
     <!-- Slide-out sidebar -->
     <div class="sidebar" id="sidebar">
@@ -144,11 +153,28 @@
                 <input type="checkbox" id="flip-camera" checked>
                 Flip Camera
             </label>
-
-            <label for="max_distance">Max Distance</label>
-            <input type="range" id="max_distance" name="max_distance" min="30" max="200" value="100">
-            <div class="slider-value"><span id="distance-value">100</span> px</div>
-        </form>
+        </div>
+        <div class="setting-group">
+            <label for="max-distance">Max Distance <span id="max-distance-value">50</span> px</label>
+            <input type="range" id="max-distance" min="10" max="200" value="50">
+        </div>
+        <div class="setting-group">
+            <label>
+                <input type="checkbox" id="motor-toggle" checked>
+                Enable Motor Movement
+            </label>
+        </div>
+        <div class="setting-group">
+            <label>
+                <input type="checkbox" id="dark-mode-toggle" checked>
+                Dark Mode
+            </label>
+        </div>
+    </div>
+    <!-- Bottom center buttons -->
+    <div class="bottom-center-bar">
+        <button id="settings-btn">Settings</button>
+        <button id="quit-btn">Quit</button>
     </div>
     <script>
         // Sidebar open/close logic using toggle
@@ -163,6 +189,52 @@
             if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== settingsBtn) {
                 sidebar.classList.remove('open');
             }
+        });
+
+        document.getElementById('flip-camera').addEventListener('change', function() {
+            fetch('/set_config', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'flip': this.checked
+                })
+            });
+        });
+
+        const maxDistElem = document.getElementById('max-distance');
+        const maxDistValElem = document.getElementById('max-distance-value');
+        maxDistElem.addEventListener('input', function() {
+            maxDistValElem.textContent = this.value;
+            fetch('/set_config', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'max_distance': this.value
+                })
+            });
+        });
+
+        // Motor enable toggle
+        document.getElementById('motor-toggle').addEventListener('change', function() {
+            fetch('/set_config', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'motor_enabled': this.checked
+                })
+            });
+        });
+
+        document.getElementById('quit-btn').addEventListener('click', function() {
+            fetch('/set_config', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'quit': 'true'
+                })
+            });
+        });
+
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        darkModeToggle.addEventListener('change', function() {
+            document.body.classList.toggle('light-mode', !this.checked);
         });
     </script>
 </body>

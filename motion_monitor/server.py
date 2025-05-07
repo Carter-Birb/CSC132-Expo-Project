@@ -2,10 +2,14 @@ from flask import Flask, render_template, Response, jsonify, request
 from face_tracker import FaceTracker
 import webbrowser
 import threading
-import cv2  # Import cv2 to handle image encoding
+import cv2
+from time import sleep
+import os
 
 app = Flask(__name__)
-tracker = FaceTracker(camera_index=0)  # Initialize the FaceTracker
+
+tracker = FaceTracker(camera_index=0)
+quit = False
 
 # Motor settings
 MICROSTEPPING = 8
@@ -36,13 +40,30 @@ def video_feed():
 
 @app.route('/set_config', methods=['POST'])
 def set_config():
-    """Handle configuration updates for the tracker."""
+    global quit, motor_enabled
     data = request.form
-    flip = data.get('flip') == 'true'
-    max_distance = float(data.get('max_distance', 100))
+    if data.get('quit') == 'true':
+        quit = True
+        print("Quit flag set. Sending final response to RPI...")
+        sleep(1)
+        shutdown_server()
+        return jsonify({"message": "Server is shutting down..."}), 200
 
-    tracker.update_settings(flip_camera=flip, max_distance=max_distance)  # Update the tracker settings
+    # Handle other configuration updates
+    if 'flip' in data:
+        flip = data.get('flip') == 'true'
+        tracker.update_settings(flip_camera=flip)
+    if 'max_distance' in data:
+        max_distance = float(data.get('max_distance', 100))
+        tracker.update_settings(max_distance=max_distance)
+    # --- NEW: Motor enable toggle ---
+    if 'motor_enabled' in data:
+        motor_enabled = data.get('motor_enabled') == 'true'
     return '', 204
+
+def shutdown_server():
+    print("Shutting down the server...")
+    os._exit(0)
 
 @app.route('/get_motor_commands', methods=['POST'])
 def get_motor_commands():
@@ -50,6 +71,7 @@ def get_motor_commands():
     motor_commands = {
         "direction": "",
         "motor_on": False,
+        "quit": quit,
     }
     angle_x = tracker.angle_x
     # --- NEW: Respect motor_enabled toggle ---
