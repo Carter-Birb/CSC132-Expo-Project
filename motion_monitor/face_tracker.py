@@ -45,6 +45,9 @@ class FaceTracker:
 
             # Estimate distance
             approx_distance = 5000 / w
+            
+            if approx_distance > self.max_distance:
+                return frame
 
             # Draw face bounding box and center point
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
